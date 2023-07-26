@@ -15,7 +15,7 @@ CREATE TABLE `Sensor_Data` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `sensor_id` int,
   `value` float NOT NULL DEFAULT 0,
-  `update` timestamp NOT NULL
+  `createdAt` DATETIME NOT NULL
 );
 
 CREATE TABLE `Scale` (
@@ -31,7 +31,7 @@ CREATE TABLE `Scale` (
   `protein` float NOT NULL DEFAULT 0,
   `tmb` int NOT NULL DEFAULT 0,
   `age` int NOT NULL DEFAULT 0,
-  `update` timestamp,
+  `createdAt` DATETIME NOT NULL,
   `id_user` int
 );
 

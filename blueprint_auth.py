@@ -14,7 +14,7 @@ def login():
     if user_token:
         return jsonify({"jwt_token": user_token})
     else:
-        Response(status=401)
+        Response(status=401, response="Invalid credentials")
 
 
 @auth.route('/register', methods=['POST'])
@@ -34,10 +34,10 @@ def register():
                 (user_email, user_username, password_salt, password_hash),
         ):
             # Registration Successful
-            return Response(status=201)
+            return Response(status=201, response="User created")
         else:
             # Registration Failed
-            return Response(status=409)
+            return Response(status=409, response="User already exists")
     else:
         # Registration Failed
-        return Response(status=400)
+        return Response(status=400, response="Invalid input")
