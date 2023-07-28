@@ -1,9 +1,12 @@
 import os
+from datetime import datetime
 from hashlib import pbkdf2_hmac
 from app import db
 from flask_mysqldb import MySQLdb
 import jwt
 from settings import JW
+import pytesseract
+import re
 
 
 def validate_user_input(input_type, **kwargs):
@@ -92,3 +95,101 @@ def validate_jwt(jwt_token):
         return decoded_token
     except jwt.exceptions.DecodeError:
         return False
+
+
+def process_image(image, user):
+    # text dictionary
+    text_lan = ["Weight", "BMI", "Body fat rate", "Subcutaneous fat", "Visceral fat", "Body water",
+                "Skeletal muscle rate",
+                "Muscle mass", "Bone mass", "Protein", "BMR", "Body age"]
+    # Save the image to a temporary location
+    image_path = 'temp_image.jpg'
+    image.save(image_path)
+
+    # Extract text from the image using OCR
+    extracted_text = pytesseract.image_to_string(image_path)
+
+    weight = 0
+    bmi = 0
+    body_fate_rate = 0
+    sub_fat = 0
+    visc_fat = 0
+    body_water = 0
+    skel_rate = 0
+    muscle_mass = 0
+    bone_mass = 0
+    protein = 0
+    bmr = 0
+    body_age = 0
+
+    for line in extracted_text.split("\n"):
+        # check if line contains date
+        match = re.search(r"\d{2}:\d{2}\s\w{3}\.\d{2},\d{4}", line)
+        if match:
+            date_str = match.group()
+
+            # Convert the original date string to a datetime object
+            datetime_obj = datetime.strptime(date_str, "%H:%M %b.%d,%Y")
+
+            # Format the datetime object to the desired format
+            formatted_date = datetime_obj.strftime("%d-%m-%Y %H:%M")
+
+            current_date = db_read("""SELECT * FROM scale WHERE createdAt = %s""", (formatted_date,))
+            if len(current_date) == 1:
+                return False
+
+        i = 1
+        print(line)
+        for label in text_lan:
+            if label in line:
+                value = re.search(r"\d+(\.\d+)?", line)
+
+                if value:
+                    if label == "Weight":
+                        weight = float(value.group())
+                    elif label == "Body fat rate":
+                        body_fate_rate = float(value.group())
+                    elif label == "BMI":
+                        bmi = float(value.group())
+                    elif label == "Subcutaneous fat":
+                        sub_fat = float(value.group())
+                    elif label == "Visceral fat":
+                        visc_fat = float(value.group())
+                    elif label == "Body water":
+                        body_water = float(value.group())
+                    elif label == "Skeletal muscle rate":
+                        skel_rate = float(value.group())
+                    elif label == "Muscle mass":
+                        muscle_mass = float(value.group())
+                    elif label == "Bone mass":
+                        bone_mass = float(value.group())
+                    elif label == "Protein":
+                        protein = float(value.group())
+                    elif label == "BMR":
+                        bmr = int(value.group())
+
+                    i += 1
+    print("date: ", formatted_date)
+    print("weight: ", weight)
+    print("bmi: ", bmi)
+    print("body_fate_rate: ", body_fate_rate)
+    print("sub_fat: ", sub_fat)
+    print("visc_fat: ", visc_fat)
+    print("body_water: ", body_water)
+    print("skel_rate: ", skel_rate)
+    print("muscle_mass: ", muscle_mass)
+    print("bone_mass: ", bone_mass)
+    print("protein: ", protein)
+    print("bmr: ", bmr)
+    print("body_age: ", body_age)
+    print("user: ", user)
+
+    # Insert the values into the database
+    db_write("INSERT INTO scale (createdAt, weight, bmi, fat, sub_fat, visc_fat, water,"
+             "muscle_skeleton, mass_muscle, bone_mass, protein, tmb, age, id_user) VALUES (%s, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, "
+             "%i, %i, %i)", (formatted_date, weight, bmi, body_fate_rate, sub_fat,
+                          visc_fat, body_water, skel_rate, muscle_mass,
+                          bone_mass, protein, bmr, body_age, user))
+    # Remove the temporary image
+    os.remove(image_path)
+    return True

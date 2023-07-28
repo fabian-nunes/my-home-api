@@ -17,7 +17,9 @@ db = MySQL(app)
 
 from blueprint_auth import auth
 from blueprint_sensor import sensor
+from blueprint_scale import scale
 
 # Register blueprints
 app.register_blueprint(auth, url_prefix='/api/auth')
 app.register_blueprint(sensor, url_prefix='/api/sensor')
+app.register_blueprint(scale, url_prefix='/api/scale')
