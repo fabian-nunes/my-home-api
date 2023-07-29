@@ -1,10 +1,9 @@
 import os
 from datetime import datetime
 from hashlib import pbkdf2_hmac
-from app import db
 from flask_mysqldb import MySQLdb
 import jwt
-from settings import JW
+from settings import JW, mysql as db
 import pytesseract
 import re
 
