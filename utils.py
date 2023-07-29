@@ -119,7 +119,8 @@ def process_image(image, user):
     bone_mass = 0
     protein = 0
     bmr = 0
-    body_age = 0
+    body_age = 23
+    body_age = str(body_age)
 
     for line in extracted_text.split("\n"):
         # check if line contains date
@@ -131,14 +132,14 @@ def process_image(image, user):
             datetime_obj = datetime.strptime(date_str, "%H:%M %b.%d,%Y")
 
             # Format the datetime object to the desired format
-            formatted_date = datetime_obj.strftime("%d-%m-%Y %H:%M")
+            formatted_date = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
 
             current_date = db_read("""SELECT * FROM scale WHERE createdAt = %s""", (formatted_date,))
-            if len(current_date) == 1:
+            if len(current_date) > 0:
                 return False
 
         i = 1
-        print(line)
+
         for label in text_lan:
             if label in line:
                 value = re.search(r"\d+(\.\d+)?", line)
@@ -146,47 +147,50 @@ def process_image(image, user):
                 if value:
                     if label == "Weight":
                         weight = float(value.group())
+
                     elif label == "Body fat rate":
                         body_fate_rate = float(value.group())
+
                     elif label == "BMI":
                         bmi = float(value.group())
+                        bmi = bmi / 10
+                        bmi = round(bmi, 2)
+
                     elif label == "Subcutaneous fat":
                         sub_fat = float(value.group())
+
                     elif label == "Visceral fat":
                         visc_fat = float(value.group())
+
                     elif label == "Body water":
                         body_water = float(value.group())
+                        body_water = body_water / 10
+                        body_water = round(body_water, 2)
+
                     elif label == "Skeletal muscle rate":
                         skel_rate = float(value.group())
+
                     elif label == "Muscle mass":
                         muscle_mass = float(value.group())
+                        muscle_mass = muscle_mass / 10
+                        muscle_mass = round(muscle_mass, 2)
+
                     elif label == "Bone mass":
                         bone_mass = float(value.group())
+
                     elif label == "Protein":
                         protein = float(value.group())
+
                     elif label == "BMR":
                         bmr = int(value.group())
 
+
                     i += 1
-    print("date: ", formatted_date)
-    print("weight: ", weight)
-    print("bmi: ", bmi)
-    print("body_fate_rate: ", body_fate_rate)
-    print("sub_fat: ", sub_fat)
-    print("visc_fat: ", visc_fat)
-    print("body_water: ", body_water)
-    print("skel_rate: ", skel_rate)
-    print("muscle_mass: ", muscle_mass)
-    print("bone_mass: ", bone_mass)
-    print("protein: ", protein)
-    print("bmr: ", bmr)
-    print("body_age: ", body_age)
-    print("user: ", user)
 
     # Insert the values into the database
     db_write("INSERT INTO scale (createdAt, weight, bmi, fat, sub_fat, visc_fat, water,"
-             "muscle_skeleton, mass_muscle, bone_mass, protein, tmb, age, id_user) VALUES (%s, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, "
-             "%i, %i, %i)", (formatted_date, weight, bmi, body_fate_rate, sub_fat,
+             "muscle_skeleton, mass_muscle, bone_mass, protein, tmb, age, id_user) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "
+             "%s, %s, %s)", (formatted_date, weight, bmi, body_fate_rate, sub_fat,
                           visc_fat, body_water, skel_rate, muscle_mass,
                           bone_mass, protein, bmr, body_age, user))
     # Remove the temporary image
