@@ -1,4 +1,4 @@
-CREATE TABLE `Users` (
+CREATE TABLE `users` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255) UNIQUE NOT NULL,
   `password_hash` varchar(255) NOT NULL,
@@ -6,19 +6,19 @@ CREATE TABLE `Users` (
   `email` varchar(255) UNIQUE NOT NULL
 );
 
-CREATE TABLE `Sensors` (
+CREATE TABLE `sensors` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255) UNIQUE NOT NULL
 );
 
-CREATE TABLE `Sensor_Data` (
+CREATE TABLE `sensor_data` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `sensor_id` int,
   `value` float NOT NULL DEFAULT 0,
   `createdAt` DATETIME NOT NULL
 );
 
-CREATE TABLE `Scale` (
+CREATE TABLE `scale` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `weight` float NOT NULL DEFAULT 0,
   `bmi` float NOT NULL DEFAULT 0,
@@ -36,6 +36,6 @@ CREATE TABLE `Scale` (
   `id_user` int
 );
 
-ALTER TABLE `Sensor_Data` ADD FOREIGN KEY (`sensor_id`) REFERENCES `Sensors` (`id`);
+ALTER TABLE `sensor_data` ADD FOREIGN KEY (`sensor_id`) REFERENCES `sensors` (`id`);
 
-ALTER TABLE `Scale` ADD FOREIGN KEY (`id_user`) REFERENCES `Users` (`id`);
+ALTER TABLE `scale` ADD FOREIGN KEY (`id_user`) REFERENCES `users` (`id`);
