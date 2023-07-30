@@ -8,13 +8,16 @@ CREATE TABLE `users` (
 
 CREATE TABLE `sensors` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
-  `name` varchar(255) UNIQUE NOT NULL
+  `name` varchar(255) UNIQUE NOT NULL,
+  `min` int NOT NULL,
+  `max` int NOT NULL
 );
 
 CREATE TABLE `sensor_data` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `sensor_id` int,
   `value` float NOT NULL DEFAULT 0,
+  `alert` varchar(255) NOT NULL DEFAULT 'Normal',
   `createdAt` DATETIME NOT NULL
 );
 
@@ -33,6 +36,7 @@ CREATE TABLE `scale` (
   `tmb` int NOT NULL DEFAULT 0,
   `age` int NOT NULL DEFAULT 0,
   `createdAt` DATETIME NOT NULL,
+  `alert` varchar(255) NOT NULL DEFAULT 'Normal',
   `id_user` int
 );
 

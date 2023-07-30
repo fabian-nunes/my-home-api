@@ -155,6 +155,12 @@ def process_image(image, user):
                         bmi = float(value.group())
                         bmi = bmi / 10
                         bmi = round(bmi, 2)
+                        if bmi < 18.5:
+                            alert = "Underweight"
+                        elif 18.5 <= bmi < 25:
+                            alert = "Normal"
+                        elif 25 <= bmi < 30:
+                            alert = "Overweight"
 
                     elif label == "Subcutaneous fat":
                         sub_fat = float(value.group())
@@ -189,10 +195,10 @@ def process_image(image, user):
 
     # Insert the values into the database
     db_write("INSERT INTO scale (createdAt, weight, bmi, fat, sub_fat, visc_fat, water,"
-             "muscle_skeleton, mass_muscle, bone_mass, protein, tmb, age, id_user) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "
-             "%s, %s, %s)", (formatted_date, weight, bmi, body_fate_rate, sub_fat,
+             "muscle_skeleton, mass_muscle, bone_mass, protein, tmb, age, id_user, alert) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "
+             "%s, %s, %s, %s)", (formatted_date, weight, bmi, body_fate_rate, sub_fat,
                           visc_fat, body_water, skel_rate, muscle_mass,
-                          bone_mass, protein, bmr, body_age, user))
+                          bone_mass, protein, bmr, body_age, user, alert))
     # Remove the temporary image
     os.remove(image_path)
     return True
