@@ -14,7 +14,7 @@ def data():
         return Response(status=409, response="No data stored")
     elif request.method == 'POST':
         image = request.files['img']
-        user = request.json['user']
+        user = request.form['user']
 
         values = process_image(image, user)
         return jsonify(values)

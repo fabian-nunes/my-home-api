@@ -120,7 +120,6 @@ def process_image(image, user):
     protein = 0
     bmr = 0
     body_age = 23
-    body_age = str(body_age)
 
     for line in extracted_text.split("\n"):
         # check if line contains date
@@ -136,6 +135,7 @@ def process_image(image, user):
 
             current_date = db_read("""SELECT * FROM scale WHERE createdAt = %s""", (formatted_date,))
             if len(current_date) > 0:
+                os.remove(image_path)
                 return False
 
         i = 1
