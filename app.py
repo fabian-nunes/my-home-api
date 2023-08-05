@@ -1,7 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 
-from settings import MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB, mysql
+from settings import MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB, mysql, JWT_SECRET
+from datetime import timedelta
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -12,7 +14,12 @@ app.config['MYSQL_PASSWORD'] = MYSQL_PASSWORD
 app.config['MYSQL_DB'] = MYSQL_DB
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
+app.config['JWT_SECRET_KEY'] = JWT_SECRET
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
+
 mysql.init_app(app)
+jwt = JWTManager(app)
+
 
 from blueprint_auth import auth
 from blueprint_sensor import sensor

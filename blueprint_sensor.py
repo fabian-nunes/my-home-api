@@ -1,19 +1,21 @@
 from flask import Blueprint, request, Response, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from utils import db_write, validate_jwt, db_read
+from utils import db_write, db_read
 
 sensor = Blueprint('sensor', __name__)
 
 
 @sensor.route('/create', methods=['POST'])
+@jwt_required()
 def create():
     name = request.json['name']
-    jwt = request.json['token']
     min = request.json['min']
     max = request.json['max']
     # description = request.json['description']
     # location = request.json['location']
-    if validate_jwt(jwt):
+    current_user = get_jwt_identity()
+    if current_user:
         if db_write("INSERT INTO sensors (name, min, max) VALUES (%s, %s, %s)", [name, min, max]):
             return Response(status=200, response="Sensor created")
         else:
@@ -23,22 +25,31 @@ def create():
 
 
 @sensor.route('/data', methods=['GET', 'POST'])
+@jwt_required()
 def data():
     if request.method == 'GET':
         name = request.args.get('name')
-        current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
-        if len(current_sensor) == 1:
-            sensor_id = current_sensor[0]["id"]
-            sensor_data = db_read("SELECT * FROM sensor_data WHERE sensor_id = %s order by createdAt DESC limit 1", [sensor_id])
-            # convert to JSON
-            return jsonify(sensor_data[0])
+        current_user = get_jwt_identity()
+        if current_user:
+            current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
+            if len(current_sensor) == 1:
+                sensor_id = current_sensor[0]["id"]
+                sensor_data = db_read("SELECT * FROM sensor_data WHERE sensor_id = %s order by createdAt DESC limit 1",
+                                      [sensor_id])
+                # convert to JSON
+                return jsonify(sensor_data[0])
+            else:
+                return Response(status=404, response="Sensor not found")
+        else:
+            return Response(status=401, response="Invalid Token")
     elif request.method == 'POST':
         name = request.json['name']
         jwt = request.json['token']
         value = request.json['value']
         time = request.json['update']
+        current_user = get_jwt_identity()
 
-        if validate_jwt(jwt):
+        if current_user:
             current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
             if len(current_sensor) == 1:
                 value = float(value)
@@ -53,7 +64,8 @@ def data():
                     alert = 'High'
                 else:
                     alert = 'Normal'
-                if db_write("INSERT INTO sensor_data (sensor_id, value, createdAt, alert) VALUES (%s, %s, %s, %s)", [sensor_id, value, time, alert]):
+                if db_write("INSERT INTO sensor_data (sensor_id, value, createdAt, alert) VALUES (%s, %s, %s, %s)",
+                            [sensor_id, value, time, alert]):
                     return Response(status=200, response="Data written to database")
                 else:
                     return Response(status=409, response="Could not write to database")

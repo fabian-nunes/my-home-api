@@ -1,20 +1,20 @@
 from flask import Blueprint, request, jsonify, Response
 from utils import validate_user_input, generate_hash, generate_salt, db_write, validate_user
+from flask_jwt_extended import create_access_token
 
 auth = Blueprint('auth', __name__)
 
 
 @auth.route('/login', methods=['POST'])
 def login():
-    user_email = request.json["email"]
-    user_password = request.json["password"]
+    user_email = request.form["email"]
+    user_password = request.form["password"]
 
-    user_token = validate_user(user_email, user_password)
-
-    if user_token:
-        return jsonify({"jwt_token": user_token})
+    if validate_user(user_email, user_password):
+        access_token = create_access_token(identity=user_email)
+        return jsonify(access_token=access_token)
     else:
-        Response(status=401, response="Invalid credentials")
+        return Response(status=401, response="Invalid credentials")
 
 
 @auth.route('/register', methods=['POST'])

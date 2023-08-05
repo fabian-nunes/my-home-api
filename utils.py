@@ -3,7 +3,7 @@ from datetime import datetime
 from hashlib import pbkdf2_hmac
 from flask_mysqldb import MySQLdb
 import jwt
-from settings import JW, mysql as db
+from settings import mysql as db
 import pytesseract
 import re
 
@@ -63,12 +63,6 @@ def db_read(query, params=None):
     return content
 
 
-def generate_jwt_token(content):
-    encoded_content = jwt.encode(content, JW, algorithm="HS256")
-    token = str(encoded_content)
-    return token
-
-
 def validate_user(email, password):
     current_user = db_read("""SELECT * FROM users WHERE email = %s""", (email,))
 
@@ -78,21 +72,11 @@ def validate_user(email, password):
         password_hash = generate_hash(password, saved_password_salt)
 
         if password_hash == saved_password_hash:
-            user_id = current_user[0]["id"]
-            jwt_token = generate_jwt_token({"id": user_id})
-            return jwt_token
+            return True
         else:
             return False
 
     else:
-        return False
-
-
-def validate_jwt(jwt_token):
-    try:
-        decoded_token = jwt.decode(jwt_token, JW, algorithms=["HS256"])
-        return decoded_token
-    except jwt.exceptions.DecodeError:
         return False
 
 
@@ -190,15 +174,14 @@ def process_image(image, user):
                     elif label == "BMR":
                         bmr = int(value.group())
 
-
                     i += 1
 
     # Insert the values into the database
     db_write("INSERT INTO scale (createdAt, weight, bmi, fat, sub_fat, visc_fat, water,"
              "muscle_skeleton, mass_muscle, bone_mass, protein, tmb, age, id_user, alert) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "
              "%s, %s, %s, %s)", (formatted_date, weight, bmi, body_fate_rate, sub_fat,
-                          visc_fat, body_water, skel_rate, muscle_mass,
-                          bone_mass, protein, bmr, body_age, user, alert))
+                                 visc_fat, body_water, skel_rate, muscle_mass,
+                                 bone_mass, protein, bmr, body_age, user, alert))
     # Remove the temporary image
     os.remove(image_path)
     return True
