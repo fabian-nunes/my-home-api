@@ -29,22 +29,29 @@ def create():
 def data():
     if request.method == 'GET':
         name = request.args.get('name')
+        all_data = request.args.get('all')
+        all_data = True if all_data == "true" else False
         current_user = get_jwt_identity()
         if current_user:
             current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
             if len(current_sensor) == 1:
                 sensor_id = current_sensor[0]["id"]
-                sensor_data = db_read("SELECT * FROM sensor_data WHERE sensor_id = %s order by createdAt DESC limit 1",
-                                      [sensor_id])
-                # convert to JSON
-                return jsonify(sensor_data[0])
+                if all_data:
+                    sensor_data = db_read("SELECT * FROM sensor_data WHERE sensor_id = %s order by createdAt DESC",
+                                          [sensor_id])
+                    # convert to JSON
+                    return jsonify(sensor_data)
+                else:
+                    sensor_data = db_read("SELECT * FROM sensor_data WHERE sensor_id = %s order by createdAt DESC limit 1",
+                                          [sensor_id])
+                    # convert to JSON
+                    return jsonify(sensor_data[0])
             else:
                 return Response(status=404, response="Sensor not found")
         else:
             return Response(status=401, response="Invalid Token")
     elif request.method == 'POST':
         name = request.json['name']
-        jwt = request.json['token']
         value = request.json['value']
         time = request.json['update']
         current_user = get_jwt_identity()
