@@ -11,3 +11,4 @@ MYSQL_DB = os.getenv("MYSQL_DB")
 mysql = MySQL()
 
 JWT_SECRET = os.getenv("JWT_SECRET_KEY")
+JW = os.getenv("JWT_SECRET_KEY_ESP")

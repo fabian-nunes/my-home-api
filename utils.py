@@ -3,7 +3,7 @@ from datetime import datetime
 from hashlib import pbkdf2_hmac
 from flask_mysqldb import MySQLdb
 import jwt
-from settings import mysql as db
+from settings import mysql as db, JW
 import pytesseract
 import re
 
@@ -185,3 +185,17 @@ def process_image(image, user):
     # Remove the temporary image
     os.remove(image_path)
     return True
+
+
+def generate_jwt_token(content):
+    encoded_content = jwt.encode(content, JW, algorithm="HS256")
+    token = str(encoded_content)
+    return token
+
+
+def validate_jwt(jwt_token):
+    try:
+        decoded_token = jwt.decode(jwt_token, JW, algorithms=["HS256"])
+        return decoded_token
+    except jwt.exceptions.DecodeError:
+        return False

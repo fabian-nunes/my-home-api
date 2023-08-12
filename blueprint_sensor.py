@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from utils import db_write, db_read
+from utils import db_write, db_read, validate_jwt
 
 sensor = Blueprint('sensor', __name__)
 
@@ -54,7 +54,9 @@ def data():
         name = request.json['name']
         value = request.json['value']
         time = request.json['update']
-        current_user = True
+        token = request.json['token']
+
+        current_user = validate_jwt(token)
 
         if current_user:
             current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
