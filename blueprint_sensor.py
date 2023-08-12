@@ -25,7 +25,7 @@ def create():
 
 
 @sensor.route('/data', methods=['GET', 'POST'])
-@jwt_required()
+@jwt_required(optional=True)
 def data():
     if request.method == 'GET':
         name = request.args.get('name')
@@ -54,7 +54,7 @@ def data():
         name = request.json['name']
         value = request.json['value']
         time = request.json['update']
-        current_user = get_jwt_identity()
+        current_user = True
 
         if current_user:
             current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
