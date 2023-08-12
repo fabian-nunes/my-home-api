@@ -3,9 +3,10 @@ from datetime import datetime
 from hashlib import pbkdf2_hmac
 from flask_mysqldb import MySQLdb
 import jwt
-from settings import mysql as db, JW
+from settings import mysql as db, JW, MAIL_USERNAME, mail
 import pytesseract
 import re
+from flask_mail import Message
 
 
 def validate_user_input(input_type, **kwargs):
@@ -198,4 +199,17 @@ def validate_jwt(jwt_token):
         decoded_token = jwt.decode(jwt_token, JW, algorithms=["HS256"])
         return decoded_token
     except jwt.exceptions.DecodeError:
+        return False
+
+
+def send_email(subject, body, recipient):
+    message = Message(subject=subject, sender=MAIL_USERNAME, recipients=[recipient])
+    message.body = body
+
+    try:
+        mail.send(message)
+        print("Email sent")
+        return True
+    except Exception as e:
+        print(e)
         return False

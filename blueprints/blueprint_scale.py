@@ -1,6 +1,7 @@
 from flask import Blueprint, request, Response, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from utils import db_write, db_read, process_image
+
+from utils import db_read, process_image
 
 scale = Blueprint('scale', __name__)
 
