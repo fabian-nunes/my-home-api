@@ -4,8 +4,13 @@ from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
+
 from settings import MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB, mysql, JWT_SECRET, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, \
     MAIL_PASSWORD, MAIL_USE_TLS, mail
+
+from utils import cleanup_user
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -28,6 +33,12 @@ app.config['MAIL_USE_TLS'] = MAIL_USE_TLS
 mysql.init_app(app)
 jwt = JWTManager(app)
 mail.init_app(app)
+
+# Start scheduler
+scheduler = BackgroundScheduler(daemon=True)
+atexit.register(lambda: scheduler.shutdown())
+scheduler.add_job(cleanup_user, 'interval', minutes=60)
+scheduler.start()
 
 from blueprints.blueprint_auth import auth
 from blueprints.blueprint_sensor import sensor

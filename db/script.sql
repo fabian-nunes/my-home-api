@@ -3,7 +3,10 @@ CREATE TABLE `users` (
   `name` varchar(255) UNIQUE NOT NULL,
   `password_hash` varchar(255) NOT NULL,
   `password_salt` varchar(255) NOT NULL,
-  `email` varchar(255) UNIQUE NOT NULL
+  `email` varchar(255) UNIQUE NOT NULL,
+  `confirmed` boolean NOT NULL DEFAULT false,
+  `createdAt` DATETIME NOT NULL,
+  `confirmToken` varchar(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE `sensors` (
