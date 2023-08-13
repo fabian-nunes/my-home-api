@@ -33,7 +33,22 @@ def register():
                 """INSERT INTO users (email, name, password_salt, password_hash) VALUES (%s, %s, %s, %s)""",
                 (user_email, user_username, password_salt, password_hash),
         ):
+            # Assuming you have a function send_email(subject, body, recipient_email) to send the email
+
             # Registration Successful
+            subject = "Welcome " + user_username + " to My Home!"
+
+            # Email body
+            body = "Dear " + user_username + ",\n\n" + "Welcome to My Home!\n\n" + ("We're excited to have you as part "
+                                                                                    "of our community. With My Home, "
+                                                                                    "you're now on the path to a "
+                                                                                    "smarter and more connected home "
+                                                                                    "environment.\n\n") + ("Your "
+                                                                                                           "registration was successful, and you can start enjoying the benefits of a smarter home. Log in to your account and explore the possibilities:\n\n") + "Username: " + user_username + "\n\n" + "Log in now by clicking the button below \n\n" + "If you have any questions or need assistance, please don't hesitate to reach out. Our support team is here to help.\n\n" + "Thank you for choosing My Home. Let's make your home smarter, together!\n\n" + "Best regards,\nThe My Home Team"
+
+            # Sending the email
+            send_email(subject, body, user_email)
+
             return Response(status=201, response="User created")
         else:
             # Registration Failed

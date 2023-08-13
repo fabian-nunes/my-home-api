@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
 from hashlib import pbkdf2_hmac
+
+from flask import render_template
 from flask_mysqldb import MySQLdb
 import jwt
 from settings import mysql as db, JW, MAIL_USERNAME, mail
@@ -205,6 +207,7 @@ def validate_jwt(jwt_token):
 def send_email(subject, body, recipient):
     message = Message(subject=subject, sender=MAIL_USERNAME, recipients=[recipient])
     message.body = body
+    message.html = render_template("mail.html", subject=subject, body=body)
 
     try:
         mail.send(message)
