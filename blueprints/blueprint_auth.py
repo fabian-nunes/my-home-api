@@ -23,10 +23,10 @@ def login():
 
 @auth.route('/register', methods=['POST'])
 def register():
-    user_email = request.json['email']
-    user_password = request.json['password']
-    user_password_confirm = request.json['password_confirm']
-    user_username = request.json['username']
+    user_email = request.form['email']
+    user_password = request.form['password']
+    user_password_confirm = request.form['password_confirm']
+    user_username = request.form['username']
 
     if user_password == user_password_confirm and validate_user_input(
             "authentication", email=user_email, password=user_password):
@@ -47,7 +47,7 @@ def register():
             # Registration Successful
             subject = "Welcome " + user_username + " to My Home!"
 
-            registration_link = "http://localhost:3000/confirm/" + random_string
+            registration_link = "http://192.168.1.200/confirm/" + random_string
 
             # Email body
             body = "Dear " + user_username + ",\n\n" + "Welcome to My Home!\n\n" + "We're excited to have you as part of our community. With My Home, you're now on the path to a smarter and more connected home environment.\n\n" + "Your registration was successful, and you're almost there! To complete the process and start enjoying the benefits of a smarter home, please click the following link to confirm your registration:\n\n" + registration_link + "\n\n" + "This link is valid for 24 hours. Once you've completed this step, you can log in to your account and explore the possibilities:\n\n" + "Username: " + user_username + "\n\n" + "Log in now: [Insert Login Link]\n\n" + "If you have any questions or need assistance, please don't hesitate to reach out. Our support team is here to help.\n\n" + "Thank you for choosing My Home. Let's make your home smarter, together!\n\n" + "Best regards,\nThe My Home Team"
