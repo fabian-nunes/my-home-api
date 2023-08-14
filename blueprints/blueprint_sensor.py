@@ -24,6 +24,13 @@ def create():
         return Response(status=401, response="Invalid Token")
 
 
+@sensor.route('/all', methods=['GET'])
+def sensors():
+    sensors_all = db_read("SELECT name FROM sensors")
+    # convert to JSON
+    return jsonify(sensors_all)
+
+
 @sensor.route('/data', methods=['GET', 'POST'])
 @jwt_required(optional=True)
 def data():
@@ -42,8 +49,9 @@ def data():
                     # convert to JSON
                     return jsonify(sensor_data)
                 else:
-                    sensor_data = db_read("SELECT * FROM sensor_data WHERE sensor_id = %s order by createdAt DESC limit 1",
-                                          [sensor_id])
+                    sensor_data = db_read(
+                        "SELECT * FROM sensor_data WHERE sensor_id = %s order by createdAt DESC limit 1",
+                        [sensor_id])
                     # convert to JSON
                     return jsonify(sensor_data[0])
             else:
