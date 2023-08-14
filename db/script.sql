@@ -46,3 +46,6 @@ CREATE TABLE `scale` (
 ALTER TABLE `sensor_data` ADD FOREIGN KEY (`sensor_id`) REFERENCES `sensors` (`id`);
 
 ALTER TABLE `scale` ADD FOREIGN KEY (`id_user`) REFERENCES `users` (`id`);
+
+INSERT INTO `sensors` (`name`, `min`, `max`) VALUES ('Temperature', 20, 40);
+INSERT INTO `sensors` (`name`, `min`, `max`) VALUES ('Humidity', 35, 65);
