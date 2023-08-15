@@ -47,12 +47,16 @@ def data():
                     sensor_data = db_read("SELECT * FROM sensor_data WHERE sensor_id = %s order by createdAt DESC",
                                           [sensor_id])
                     # convert to JSON
+                    if len(sensor_data) == 0:
+                        return Response(status=404, response="No data found")
                     return jsonify(sensor_data)
                 else:
                     sensor_data = db_read(
                         "SELECT * FROM sensor_data WHERE sensor_id = %s order by createdAt DESC limit 1",
                         [sensor_id])
                     # convert to JSON
+                    if len(sensor_data) == 0:
+                        return Response(status=404, response="No data found")
                     return jsonify(sensor_data[0])
             else:
                 return Response(status=404, response="Sensor not found")

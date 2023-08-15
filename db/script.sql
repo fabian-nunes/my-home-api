@@ -13,7 +13,8 @@ CREATE TABLE `sensors` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255) UNIQUE NOT NULL,
   `min` int NOT NULL,
-  `max` int NOT NULL
+  `max` int NOT NULL,
+  `img` varchar(255) NOT NULL
 );
 
 CREATE TABLE `sensor_data` (
