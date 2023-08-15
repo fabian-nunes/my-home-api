@@ -11,9 +11,9 @@ sensor = Blueprint('sensor', __name__)
 @sensor.route('/create', methods=['POST'])
 @jwt_required()
 def create():
-    name = request.json['name']
-    min = request.json['min']
-    max = request.json['max']
+    name = request.form['name']
+    min = request.form['min']
+    max = request.form['max']
     image = request.files['img']
     # description = request.json['description']
     # location = request.json['location']
