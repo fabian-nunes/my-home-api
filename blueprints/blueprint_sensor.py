@@ -45,9 +45,9 @@ def image():
     name = request.args.get('name')
     current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
     if len(current_sensor) == 1:
-        image_url = current_sensor[0]["image"]
+        image_url = current_sensor[0]["img"]
         if os.path.exists(image_url):
-            return send_file(image_url, mimetype='image/png')
+            return send_file(image_url, mimetype='image/jpg')
         return Response(status=404, response="Image not found")
     else:
         return Response(status=404, response="Sensor not found")
