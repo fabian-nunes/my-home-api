@@ -247,6 +247,6 @@ def validate_image(image):
 def store_image(image):
     filename = secure_filename(image.filename)
     image.save(os.path.join(UPLOAD_FOLDER, filename))
-    #return UPLOAD_FOLDER + filename
+    # return UPLOAD_FOLDER + filename
     image_path = UPLOAD_FOLDER + filename
     return image_path

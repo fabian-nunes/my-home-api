@@ -24,4 +24,4 @@ mail = Mail()
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}  # Allowed image file extensions
 MAX_IMAGE_SIZE = 5 * 1024 * 1024  # Maximum image size in bytes (5MB)
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
+UPLOAD_FOLDER = os.getenv("IMAGE_UPLOAD_FOLDER")
