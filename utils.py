@@ -1,17 +1,16 @@
 import os
+import re
 import time
 from datetime import datetime
 from hashlib import pbkdf2_hmac
 
-from flask import render_template
-from flask_mysqldb import MySQLdb
 import jwt
-from werkzeug.utils import secure_filename
+import pytesseract
+from flask import render_template
+from flask_mail import Message
+from flask_mysqldb import MySQLdb
 
 from settings import mysql as db, JW, MAIL_USERNAME, mail, ALLOWED_EXTENSIONS, MAX_IMAGE_SIZE, UPLOAD_FOLDER
-import pytesseract
-import re
-from flask_mail import Message
 
 
 def validate_user_input(input_type, **kwargs):
@@ -249,7 +248,8 @@ def store_image(image):
     timestamp = int(time.time())
     image_filename = f"{timestamp}.jpg"
 
-    image_path = os.path.join(UPLOAD_FOLDER, image_filename)
+    user_home = os.path.expanduser("~")
+    image_path = os.path.join(user_home, UPLOAD_FOLDER, image_filename)
     image.seek(0)  # Reset file pointer before saving
     image.save(image_path)
     return image_path
