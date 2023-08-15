@@ -1,7 +1,9 @@
-from flask import Blueprint, request, Response, jsonify
+import os
+
+from flask import Blueprint, request, Response, jsonify, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from utils import db_write, db_read, validate_jwt
+from utils import db_write, db_read, validate_jwt, validate_image, store_image
 
 sensor = Blueprint('sensor', __name__)
 
@@ -12,11 +14,18 @@ def create():
     name = request.json['name']
     min = request.json['min']
     max = request.json['max']
+    image = request.files['img']
     # description = request.json['description']
     # location = request.json['location']
     current_user = get_jwt_identity()
     if current_user:
-        if db_write("INSERT INTO sensors (name, min, max) VALUES (%s, %s, %s)", [name, min, max]):
+
+        valid_image = validate_image(image)
+        if not valid_image:
+            return Response(status=400, response="Invalid Image")
+
+        image_url = store_image(image)
+        if db_write("INSERT INTO sensors (name, min, max, image) VALUES (%s, %s, %s %s)", [name, min, max, image_url]):
             return Response(status=200, response="Sensor created")
         else:
             return Response(status=409, response="Sensor already exists")
@@ -29,6 +38,19 @@ def sensors():
     sensors_all = db_read("SELECT name FROM sensors")
     # convert to JSON
     return jsonify(sensors_all)
+
+
+@sensor.route('/image', methods=['GET'])
+def image():
+    name = request.args.get('name')
+    current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
+    if len(current_sensor) == 1:
+        image_url = current_sensor[0]["image"]
+        if os.path.exists(image_url):
+            return send_file(image_url, mimetype='image/png')
+        return Response(status=404, response="Image not found")
+    else:
+        return Response(status=404, response="Sensor not found")
 
 
 @sensor.route('/data', methods=['GET', 'POST'])

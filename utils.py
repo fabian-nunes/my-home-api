@@ -5,7 +5,9 @@ from hashlib import pbkdf2_hmac
 from flask import render_template
 from flask_mysqldb import MySQLdb
 import jwt
-from settings import mysql as db, JW, MAIL_USERNAME, mail
+from werkzeug.utils import secure_filename
+
+from settings import mysql as db, JW, MAIL_USERNAME, mail, ALLOWED_EXTENSIONS, MAX_IMAGE_SIZE, UPLOAD_FOLDER
 import pytesseract
 import re
 from flask_mail import Message
@@ -224,3 +226,27 @@ def cleanup_user():
 
     for user in users:
         db_write("""DELETE FROM users WHERE id = %s""", (user["id"],))
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def validate_image(image):
+    if image.filename == '':
+        return False
+    if not image or not allowed_file(image.filename):
+        return False
+
+    if len(image.read()) > MAX_IMAGE_SIZE:
+        return False
+
+    return True
+
+
+def store_image(image):
+    filename = secure_filename(image.filename)
+    image.save(os.path.join(UPLOAD_FOLDER, filename))
+    #return UPLOAD_FOLDER + filename
+    image_path = UPLOAD_FOLDER + filename
+    return image_path
