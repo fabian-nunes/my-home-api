@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime
 from hashlib import pbkdf2_hmac
 
@@ -245,8 +246,10 @@ def validate_image(image):
 
 
 def store_image(image):
-    filename = secure_filename(image.filename)
-    image.save(os.path.join(UPLOAD_FOLDER, filename))
-    # return UPLOAD_FOLDER + filename
-    image_path = UPLOAD_FOLDER + filename
+    timestamp = int(time.time())
+    image_filename = f"{timestamp}.jpg"
+
+    image_path = os.path.join(UPLOAD_FOLDER, image_filename)
+    image.seek(0)  # Reset file pointer before saving
+    image.save(image_path)
     return image_path
