@@ -33,11 +33,21 @@ def create():
         return Response(status=401, response="Invalid Token")
 
 
-@sensor.route('/all', methods=['GET'])
+@sensor.route('/specs', methods=['GET'])
 def sensors():
-    sensors_all = db_read("SELECT name FROM sensors")
-    # convert to JSON
-    return jsonify(sensors_all)
+    all_data = request.args.get('all')
+    all_data = True if all_data == "true" else False
+    if all_data:
+        sensors_all = db_read("SELECT name FROM sensors")
+        # convert to JSON
+        return jsonify(sensors_all)
+    else:
+        name = request.args.get('name')
+        current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
+        if len(current_sensor) == 1:
+            return jsonify(current_sensor[0])
+        else:
+            return Response(status=404, response="Sensor not found")
 
 
 @sensor.route('/image', methods=['GET'])
