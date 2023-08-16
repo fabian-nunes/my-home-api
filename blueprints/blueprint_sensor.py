@@ -8,27 +8,44 @@ from utils import db_write, db_read, validate_jwt, validate_image, store_image
 sensor = Blueprint('sensor', __name__)
 
 
-@sensor.route('/create', methods=['POST'])
+@sensor.route('/create', methods=['POST', 'PUT'])
 @jwt_required()
 def create():
-    name = request.form['name']
-    min = request.form['min']
-    max = request.form['max']
-    image = request.files['img']
     # description = request.json['description']
     # location = request.json['location']
     current_user = get_jwt_identity()
     if current_user:
+        name = request.form['name']
+        min = request.form['min']
+        max = request.form['max']
+        image = request.files['img']
 
-        valid_image = validate_image(image)
-        if not valid_image:
-            return Response(status=400, response="Invalid Image")
+        if request.method == 'PUT':
+            if image is not None:
+                valid_image = validate_image(image)
+                if not valid_image:
+                    return Response(status=400, response="Invalid Image")
 
-        image_url = store_image(image)
-        if db_write("INSERT INTO sensors (name, min, max, img) VALUES (%s, %s, %s, %s)", [name, min, max, image_url]):
-            return Response(status=200, response="Sensor created")
+                image_url = store_image(image)
+                sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
+                if len(sensor) == 1:
+                    if image is not None:
+                        db_write("UPDATE sensors SET name = %s, min = %s, max = %s, img = %s WHERE name = %s", [name, min, max, image_url, name])
+                    else:
+                        db_write("UPDATE sensors SET name = %s, min = %s, max = %s WHERE name = %s", [name, min, max, name])
+                    return Response(status=200, response="Sensor updated")
+                else:
+                    return Response(status=404, response="Sensor not found")
         else:
-            return Response(status=409, response="Sensor already exists")
+            valid_image = validate_image(image)
+            if not valid_image:
+                return Response(status=400, response="Invalid Image")
+
+            image_url = store_image(image)
+            if db_write("INSERT INTO sensors (name, min, max, img) VALUES (%s, %s, %s, %s)", [name, min, max, image_url]):
+                return Response(status=200, response="Sensor created")
+            else:
+                return Response(status=409, response="Sensor already exists")
     else:
         return Response(status=401, response="Invalid Token")
 
@@ -43,7 +60,7 @@ def sensors():
         return jsonify(sensors_all)
     else:
         name = request.args.get('name')
-        current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
+        current_sensor = db_read("SELECT name, min, max  FROM sensors WHERE name = %s", [name])
         if len(current_sensor) == 1:
             return jsonify(current_sensor[0])
         else:
