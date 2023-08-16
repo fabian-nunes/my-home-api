@@ -15,28 +15,29 @@ def create():
     # location = request.json['location']
     current_user = get_jwt_identity()
     if current_user:
-        name = request.form['name']
         min = request.form['min']
         max = request.form['max']
         image = request.files['img']
 
         if request.method == 'PUT':
+            name = request.args.get('name')
             if image is not None:
                 valid_image = validate_image(image)
                 if not valid_image:
                     return Response(status=400, response="Invalid Image")
 
                 image_url = store_image(image)
-                sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
-                if len(sensor) == 1:
-                    if image is not None:
-                        db_write("UPDATE sensors SET name = %s, min = %s, max = %s, img = %s WHERE name = %s", [name, min, max, image_url, name])
-                    else:
-                        db_write("UPDATE sensors SET name = %s, min = %s, max = %s WHERE name = %s", [name, min, max, name])
-                    return Response(status=200, response="Sensor updated")
+            sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
+            if len(sensor) == 1:
+                if image is not None:
+                    db_write("UPDATE sensors SET name = %s, min = %s, max = %s, img = %s WHERE name = %s", [name, min, max, image_url, name])
                 else:
-                    return Response(status=404, response="Sensor not found")
+                    db_write("UPDATE sensors SET name = %s, min = %s, max = %s WHERE name = %s", [name, min, max, name])
+                return Response(status=200, response="Sensor updated")
+            else:
+                return Response(status=404, response="Sensor not found")
         else:
+            name = request.form['name']
             valid_image = validate_image(image)
             if not valid_image:
                 return Response(status=400, response="Invalid Image")
