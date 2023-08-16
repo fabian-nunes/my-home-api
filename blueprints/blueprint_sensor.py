@@ -21,7 +21,7 @@ def create():
 
         if request.method == 'PUT':
             name = request.args.get('name')
-            if image is not None:
+            if image.filename != '':
                 valid_image = validate_image(image)
                 if not valid_image:
                     return Response(status=400, response="Invalid Image")
