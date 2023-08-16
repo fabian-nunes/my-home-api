@@ -29,7 +29,7 @@ def create():
                 image_url = store_image(image)
             sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
             if len(sensor) == 1:
-                if image is not None:
+                if image.filename != '':
                     db_write("UPDATE sensors SET name = %s, min = %s, max = %s, img = %s WHERE name = %s", [name, min, max, image_url, name])
                 else:
                     db_write("UPDATE sensors SET name = %s, min = %s, max = %s WHERE name = %s", [name, min, max, name])
