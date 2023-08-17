@@ -30,7 +30,8 @@ def create():
             sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
             if len(sensor) == 1:
                 if image.filename != '':
-                    db_write("UPDATE sensors SET name = %s, min = %s, max = %s, img = %s WHERE name = %s", [name, min, max, image_url, name])
+                    db_write("UPDATE sensors SET name = %s, min = %s, max = %s, img = %s WHERE name = %s",
+                             [name, min, max, image_url, name])
                 else:
                     db_write("UPDATE sensors SET name = %s, min = %s, max = %s WHERE name = %s", [name, min, max, name])
                 return Response(status=200, response="Sensor updated")
@@ -38,12 +39,15 @@ def create():
                 return Response(status=404, response="Sensor not found")
         else:
             name = request.form['name']
+            if name == '' or name == 'Scale':
+                return Response(status=400, response="Invalid name")
             valid_image = validate_image(image)
             if not valid_image:
                 return Response(status=400, response="Invalid Image")
 
             image_url = store_image(image)
-            if db_write("INSERT INTO sensors (name, min, max, img) VALUES (%s, %s, %s, %s)", [name, min, max, image_url]):
+            if db_write("INSERT INTO sensors (name, min, max, img) VALUES (%s, %s, %s, %s)",
+                        [name, min, max, image_url]):
                 return Response(status=200, response="Sensor created")
             else:
                 return Response(status=409, response="Sensor already exists")
@@ -79,6 +83,24 @@ def image():
         return Response(status=404, response="Image not found")
     else:
         return Response(status=404, response="Sensor not found")
+
+
+@sensor.route('/delete', methods=['DELETE'])
+@jwt_required()
+def delete():
+    name = request.args.get('name')
+    current_user = get_jwt_identity()
+    if current_user:
+        current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
+        if len(current_sensor) == 1:
+            sensor_id = current_sensor[0]["id"]
+            db_write("DELETE FROM sensors WHERE name = %s", [name])
+            db_write("DELETE FROM sensor_data WHERE sensor_id = %s", [sensor_id])
+            return Response(status=200, response="Sensor deleted")
+        else:
+            return Response(status=404, response="Sensor not found")
+    else:
+        return Response(status=401, response="Invalid Token")
 
 
 @sensor.route('/data', methods=['GET', 'POST'])
