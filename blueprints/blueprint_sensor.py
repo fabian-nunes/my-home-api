@@ -60,12 +60,12 @@ def sensors():
     all_data = request.args.get('all')
     all_data = True if all_data == "true" else False
     if all_data:
-        sensors_all = db_read("SELECT name FROM sensors")
+        sensors_all = db_read("SELECT name, color FROM sensors")
         # convert to JSON
         return jsonify(sensors_all)
     else:
         name = request.args.get('name')
-        current_sensor = db_read("SELECT name, min, max  FROM sensors WHERE name = %s", [name])
+        current_sensor = db_read("SELECT name, min, max, color  FROM sensors WHERE name = %s", [name])
         if len(current_sensor) == 1:
             return jsonify(current_sensor[0])
         else:

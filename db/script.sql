@@ -14,7 +14,8 @@ CREATE TABLE `sensors` (
   `name` varchar(255) UNIQUE NOT NULL,
   `min` int NOT NULL,
   `max` int NOT NULL,
-  `img` varchar(255) NOT NULL
+  `img` varchar(255) NOT NULL,
+  `color` varchar(255) NOT NULL
 );
 
 CREATE TABLE `sensor_data` (
