@@ -223,7 +223,8 @@ def send_email(subject, body, recipient):
 def cleanup_user():
     # get users that are not confirmed and older than 1 day
     users = db_read("""SELECT * FROM users where confirmed = 0 and createdAt > DATE_SUB(NOW(), INTERVAL 1 DAY)""")
-
+    if len(users) == 0:
+        return
     for user in users:
         db_write("""DELETE FROM users WHERE id = %s""", (user["id"],))
 

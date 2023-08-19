@@ -94,6 +94,9 @@ def delete():
         current_sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
         if len(current_sensor) == 1:
             sensor_id = current_sensor[0]["id"]
+            img = current_sensor[0]["img"]
+            if os.path.exists(img):
+                os.remove(img)
             db_write("DELETE FROM sensors WHERE name = %s", [name])
             db_write("DELETE FROM sensor_data WHERE sensor_id = %s", [sensor_id])
             return Response(status=200, response="Sensor deleted")
