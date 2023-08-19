@@ -17,6 +17,7 @@ def create():
     if current_user:
         min = request.form['min']
         max = request.form['max']
+        color = request.form['color']
         image = request.files['img']
 
         if request.method == 'PUT':
@@ -46,8 +47,8 @@ def create():
                 return Response(status=400, response="Invalid Image")
 
             image_url = store_image(image)
-            if db_write("INSERT INTO sensors (name, min, max, img) VALUES (%s, %s, %s, %s)",
-                        [name, min, max, image_url]):
+            if db_write("INSERT INTO sensors (name, min, max, img, color) VALUES (%s, %s, %s, %s, %s)",
+                        [name, min, max, image_url, color]):
                 return Response(status=200, response="Sensor created")
             else:
                 return Response(status=409, response="Sensor already exists")
