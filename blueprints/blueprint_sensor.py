@@ -31,10 +31,10 @@ def create():
             sensor = db_read("SELECT * FROM sensors WHERE name = %s", [name])
             if len(sensor) == 1:
                 if image.filename != '':
-                    db_write("UPDATE sensors SET name = %s, min = %s, max = %s, img = %s WHERE name = %s",
-                             [name, min, max, image_url, name])
+                    db_write("UPDATE sensors SET name = %s, min = %s, max = %s, img = %s, color = %s WHERE name = %s",
+                             [name, min, max, image_url, color, name])
                 else:
-                    db_write("UPDATE sensors SET name = %s, min = %s, max = %s WHERE name = %s", [name, min, max, name])
+                    db_write("UPDATE sensors SET name = %s, min = %s, max = %s, color = %s WHERE name = %s", [name, min, max, color, name])
                 return Response(status=200, response="Sensor updated")
             else:
                 return Response(status=404, response="Sensor not found")
