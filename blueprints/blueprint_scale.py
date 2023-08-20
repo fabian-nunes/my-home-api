@@ -24,7 +24,7 @@ def data():
         if current_user:
 
             # get id from user
-            user_id = db_read("SELECT id FROM user WHERE email = %s", (current_user,))
+            user_id = db_read("SELECT id FROM users WHERE email = %s", (current_user,))
             values = process_image(image, user_id)
             if values:
                 return Response(status=200, response="Data stored")
