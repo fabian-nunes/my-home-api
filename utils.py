@@ -12,6 +12,8 @@ from flask_mysqldb import MySQLdb
 
 from settings import mysql as db, JW, MAIL_USERNAME, mail, ALLOWED_EXTENSIONS, MAX_IMAGE_SIZE, UPLOAD_FOLDER
 
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+
 
 def validate_user_input(input_type, **kwargs):
     if input_type == "authentication":
