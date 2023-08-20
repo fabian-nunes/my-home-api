@@ -111,6 +111,7 @@ def process_image(image, user):
     protein = 0
     bmr = 0
     body_age = 23
+    alert = "Normal"
 
     for line in extracted_text.split("\n"):
         # check if line contains date
