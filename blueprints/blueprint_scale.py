@@ -10,13 +10,21 @@ scale = Blueprint('scale', __name__)
 @jwt_required()
 def data():
     if request.method == 'GET':
+        all_data = request.args.get('all')
+        all_data = True if all_data == "true" else False
         current_user = get_jwt_identity()
         if current_user:
-            current_scale = db_read(
-                "SELECT weight as value, createdAt, alert from scale order by createdAt DESC limit 1")
-            if len(current_scale) == 1:
-                return jsonify(current_scale[0])
-            return Response(status=409, response="No data stored")
+            if all_data:
+                all_scale = db_read("SELECT * from scale order by createdAt DESC")
+                if len(all_scale) > 0:
+                    return jsonify(all_scale)
+                return Response(status=409, response="No data stored")
+            else:
+                current_scale = db_read(
+                    "SELECT weight as value, createdAt, alert from scale order by createdAt DESC limit 1")
+                if len(current_scale) == 1:
+                    return jsonify(current_scale[0])
+                return Response(status=409, response="No data stored")
         return Response(status=401, response="Unauthorized")
     elif request.method == 'POST':
         image = request.files['img']
