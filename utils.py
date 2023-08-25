@@ -112,7 +112,7 @@ def process_image(image, user):
     bmr = 0
     body_age = 23
     alert = "Normal"
-    #user = int(user)
+    # user = int(user)
 
     for line in extracted_text.split("\n"):
         # check if line contains date
@@ -258,3 +258,33 @@ def store_image(image):
     image.seek(0)  # Reset file pointer before saving
     image.save(image_path)
     return image_path
+
+
+def change_password(password, current_user):
+    password_salt = generate_salt()
+    password_hash = generate_hash(password, password_salt)
+
+    if db_write(
+            """UPDATE users SET password_salt = %s, password_hash = %s WHERE email = %s""",
+            (password_salt, password_hash, current_user)
+    ):
+        return True
+    return False
+
+
+def change_name(new_name, current_user):
+    if db_write(
+            """UPDATE users SET name = %s WHERE email = %s""",
+            (new_name, current_user)
+    ):
+        return True
+    return False
+
+
+def clean_forgot_password():
+    # get users that are not confirmed and older than 1 day
+    users = db_read("""SELECT * FROM forgot_password where createdAt > DATE_SUB(NOW(), INTERVAL 1 DAY)""")
+    if len(users) == 0:
+        return
+    for user in users:
+        db_write("""DELETE FROM forgot_password WHERE id = %s""", (user["id"],))

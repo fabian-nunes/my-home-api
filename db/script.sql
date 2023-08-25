@@ -45,6 +45,15 @@ CREATE TABLE `scale` (
   `id_user` int
 );
 
+CREATE TABLE `forgot_password` (
+  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `id_user` int,
+  `token` varchar(255) NOT NULL UNIQUE,
+  `createdAt` DATETIME NOT NULL
+);
+
 ALTER TABLE `sensor_data` ADD FOREIGN KEY (`sensor_id`) REFERENCES `sensors` (`id`);
 
 ALTER TABLE `scale` ADD FOREIGN KEY (`id_user`) REFERENCES `users` (`id`);
+
+ALTER TABLE `forgot_password` ADD FOREIGN KEY (`id_user`) REFERENCES `users` (`id`);
