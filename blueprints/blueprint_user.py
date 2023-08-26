@@ -23,7 +23,7 @@ def data():
 
 @user.route('/changeInformation', methods=['POST'])
 @jwt_required()
-def change_password():
+def change_user_password():
     current_user = get_jwt_identity()
     if current_user:
         user = db_read("SELECT name FROM users WHERE email = %s", (current_user,))
