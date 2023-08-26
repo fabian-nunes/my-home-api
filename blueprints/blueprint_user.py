@@ -33,12 +33,14 @@ def change_user_password():
 
         if new_password is not None and new_password != "":
             if new_password == new_password_confirm:
-                change_password(new_password, current_user)
+                if change_password(new_password, current_user) is False:
+                    return Response(status=409, response="Something went wrong")
             return Response(status=400, response="Passwords do not match")
 
         if user_name is not None:
             if user_name != user[0]['name']:
-                change_name(user_name, current_user)
+                if change_name(user_name, current_user) is False:
+                    return Response(status=409, response="Something went wrong")
 
         return Response(status=200, response="Information changed")
     return Response(status=401, response="Unauthorized")
@@ -59,7 +61,8 @@ def reset_password():
         return Response(status=409, response="User not found")
     if new_password is not None:
         if new_password == new_password_confirm:
-            change_password(new_password, data)
+            if change_password(new_password, user_data[0]['email']) is False:
+                return Response(status=409, response="Something went wrong")
             db_write("DELETE FROM forgot_password WHERE token = %s", (token,))
         return Response(status=400, response="Passwords do not match")
 
