@@ -50,8 +50,8 @@ def change_user_password():
 @user.route('/reset', methods=['POST'])
 def reset_password():
     token = request.form['token']
-    new_password = request.form['newPassword']
-    new_password_confirm = request.form['newPasswordConfirm']
+    new_password = request.form['password']
+    new_password_confirm = request.form['passwordConfirm']
 
     user = db_read("SELECT user_id FROM forgot_password WHERE token = %s", (token,))
     if len(user) == 0:
