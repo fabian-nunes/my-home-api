@@ -44,11 +44,13 @@ scheduler.start()
 from blueprints.blueprint_auth import auth
 from blueprints.blueprint_sensor import sensor
 from blueprints.blueprint_scale import scale
+from blueprints.blueprint_user import user
 
 # Register blueprints
 app.register_blueprint(auth, url_prefix='/api/auth')
 app.register_blueprint(sensor, url_prefix='/api/sensor')
 app.register_blueprint(scale, url_prefix='/api/scale')
+app.register_blueprint(user, url_prefix='/api/user')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

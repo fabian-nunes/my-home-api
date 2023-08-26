@@ -14,7 +14,7 @@ user = Blueprint('user', __name__)
 def data():
     current_user = get_jwt_identity()
     if current_user:
-        c_user = db_read("SELECT email, name FROM users WHERE email = %s", (current_user,))
+        c_user = db_read("SELECT name FROM users WHERE email = %s", (current_user,))
         if len(c_user) == 1:
             return jsonify(c_user[0])
         return Response(status=409, response="No data stored")
