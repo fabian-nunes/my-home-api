@@ -35,7 +35,8 @@ def change_user_password():
             if new_password == new_password_confirm:
                 if change_password(new_password, current_user) is False:
                     return Response(status=409, response="Something went wrong")
-            return Response(status=400, response="Passwords do not match")
+            else:
+                return Response(status=400, response="Passwords do not match")
 
         if user_name is not None:
             if user_name != user[0]['name']:
