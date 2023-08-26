@@ -27,11 +27,11 @@ def change_password():
     current_user = get_jwt_identity()
     if current_user:
         user = db_read("SELECT name FROM users WHERE email = %s", (current_user,))
-        new_password = request.form['newPassword']
-        new_password_confirm = request.form['newPasswordConfirm']
-        user_name = request.form['userName']
+        new_password = request.form['password']
+        new_password_confirm = request.form['password_confirm']
+        user_name = request.form['username']
 
-        if new_password is not None:
+        if new_password is not None and new_password != "":
             if new_password == new_password_confirm:
                 change_password(new_password, current_user)
             return Response(status=400, response="Passwords do not match")
