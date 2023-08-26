@@ -28,7 +28,7 @@ def change_user_password():
     if current_user:
         user = db_read("SELECT name FROM users WHERE email = %s", (current_user,))
         new_password = request.form['password']
-        new_password_confirm = request.form['password_confirm']
+        new_password_confirm = request.form['passwordConfirm']
         user_name = request.form['username']
 
         if new_password is not None and new_password != "":
