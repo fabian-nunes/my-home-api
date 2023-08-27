@@ -65,7 +65,8 @@ def reset_password():
             if change_password(new_password, user_data[0]['email']) is False:
                 return Response(status=409, response="Something went wrong")
             db_write("DELETE FROM forgot_password WHERE token = %s", (token,))
-        return Response(status=400, response="Passwords do not match")
+        else:
+            return Response(status=400, response="Passwords do not match")
 
     return Response(status=200, response="Password changed")
 
