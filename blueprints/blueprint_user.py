@@ -90,7 +90,7 @@ def forgot_email():
         # send email with link
         subject = "Reset Password"
 
-        reset_link = "http://192.168.1.120/reset/" + random_string
+        reset_link = "http://192.168.1.200/reset/" + random_string
 
         # Email body
         body = "Dear " + email + ",\n\n" + "You have requested to reset your password.\n\n" + "Please click the following link to reset your password:\n\n" + reset_link + "\n\n" + "This link is valid for 24 hours.\n\n" + "If you have any questions or need assistance, please don't hesitate to reach out. Our support team is here to help.\n\n" + "Thank you for choosing My Home. Let's make your home smarter, together!\n\n" + "Best regards,\nThe My Home Team"
