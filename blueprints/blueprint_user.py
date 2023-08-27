@@ -84,7 +84,7 @@ def forgot_email():
     random_string = ''.join(random.choice('0123456789ABCDEF') for i in range(16))
     created_at = datetime.datetime.now()
     # store random string in database
-    if db_write("INSERT INTO forgot_password (id_user, token, created_at) VALUES (%s, %s, %s)",
+    if db_write("INSERT INTO forgot_password (id_user, token, createdAt) VALUES (%s, %s, %s)",
                 (user_id, random_string, created_at)):
         # send email with link
         subject = "Reset Password"
