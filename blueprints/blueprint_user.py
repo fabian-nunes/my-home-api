@@ -53,10 +53,10 @@ def reset_password():
     new_password = request.form['password']
     new_password_confirm = request.form['passwordConfirm']
 
-    user = db_read("SELECT user_id FROM forgot_password WHERE token = %s", (token,))
+    user = db_read("SELECT id_user FROM forgot_password WHERE token = %s", (token,))
     if len(user) == 0:
         return Response(status=409, response="Token not found")
-    user = user[0]['user_id']
+    user = user[0]['id_user']
     user_data = db_read("SELECT email FROM users WHERE id = %s", (user,))
     if len(user_data) == 0:
         return Response(status=409, response="User not found")
